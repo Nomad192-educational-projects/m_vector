@@ -1,5 +1,4 @@
 #include <iostream>
-
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 template<typename new_T>
@@ -11,27 +10,26 @@ class m_vector
 private:
     size_t n;
     T *data;
-    class Iterator<T> *it;
 
 public:
-    m_vector(std::initializer_list<T> lst) : n{lst.size()}, data(new T[n]), it{*this}
+    m_vector(std::initializer_list<T> lst) : n{lst.size()}, data(new T[n])
     {
         std::copy(lst.begin(), lst.end(), data);
     }
 
     Iterator<T> iterator_begin()
     {
-        return *it;
+        return Iterator<T>(this, 0);
     }
 
     Iterator<T> iterator_end()
     {
-        return *it;
+        return Iterator<T>(this, n);
     }
 
-    explicit m_vector(int length) : n{(size_t)length}, data(new T[n]), it{new Iterator<T>(*this)} {}
+    explicit m_vector(int length) : n{(size_t)length}, data(new T[n]) {}
 
-    m_vector(m_vector<T> &vect) : n{(size_t)vect.get_length()}, data(new T[n]), it{new Iterator<T>(*this)}
+    m_vector(m_vector<T> &vect) : n{(size_t)vect.get_length()}, data(new T[n])
     {
         for (size_t i = 0; i < n; i++)
         {
@@ -43,18 +41,19 @@ public:
     {
         delete[] data;
     }
-    m_vector<T>& operator =( m_vector<T>& lst)  ///m_vector const& lst
+    m_vector<T>& operator =( m_vector<T> const& lst)  ///m_vector const& lst
     {
         if(this == &lst)
             return *this;
 
         delete[] data;
-        data = new T[lst.get_length()];
-        for(size_t i = 0; i < lst.get_length(); i++)
+        n = lst.get_length();
+        data = new T[n];
+        for(size_t i = 0; i < n; i++)
             data[i] = lst[i];
         return *this;
     }
-    int get_length()
+    int get_length() const
     {
         return (int)n;
     }
@@ -70,6 +69,10 @@ public:
         return data[(size_t)index];
     }
 
+    T& operator[](int index) const
+    {
+        return data[(size_t)index];
+    }
     template<typename _T>
     friend std::ostream& operator <<(std::ostream& os, m_vector<_T>& lst);
 
@@ -105,10 +108,10 @@ public:
     friend m_vector<_T> operator -(m_vector<_T>& v1, m_vector<_T>& v2); ///зачем friend
 
     template<typename _T>
-    friend m_vector<_T> operator *(m_vector<_T>& v1, _T& val);
+    friend m_vector<_T> operator *(m_vector<_T>& v1, _T& val);  ///зачем friend
 
     template<typename _T>
-    friend m_vector<_T> operator /(m_vector<_T>& v1, _T& val);
+    friend m_vector<_T> operator /(m_vector<_T>& v1, _T& val);  ///зачем friend
 };
 
 template<typename _T>
@@ -162,6 +165,7 @@ private:
 
 public:
     Iterator<T>(m_vector<T> container_obj) : i{0}, container_obj{&container_obj} {}
+    Iterator<T>(m_vector<T> *container_obj, size_t n) : i{n}, container_obj{container_obj} {}
     //Iterator(T *first) : cur {first} {}
 
     Iterator<T> next() {
@@ -196,7 +200,7 @@ public:
 };
 
 int main() {
-    m_vector<int> the_vector(10);
+    /*m_vector<int> the_vector(10);
    // Iterator_LOL<int> the_iterator = the_vector.iterator_begin();
 
     //m_vector<int>::Iterator<int> the_iterator = the_vector.iterator_begin();
@@ -207,7 +211,7 @@ int main() {
 
 
     //Iterator<int> new_iterator(the_vector);
-    Iterator<int> new_iterator = the_vector.iterator_begin();
+    Iterator<int> new_iterator = the_vector.iterator_end();
 
     int i = 0;
     while(!new_iterator.is_end())
@@ -215,6 +219,17 @@ int main() {
         std::cout << i << " = " << new_iterator.value() << "\n";
         new_iterator.next();
         i++;
-    }
+    }*/
+    m_vector<int> the_vector_1({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+    m_vector<int> the_vector_2({10, 11, 12, 13, 14, 15, 16, 17, 18, 19});
+
+    std::cout << the_vector_1 << std::endl;
+    std::cout << the_vector_2 << std::endl;
+
+    m_vector<int> the_vector_3(10);
+    the_vector_3 = the_vector_2 + the_vector_1;
+
+    std::cout << the_vector_3 << std::endl;
+
     return 0;
 }
