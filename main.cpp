@@ -1,235 +1,385 @@
 #include <iostream>
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#include "m_vector.h"
 
-template<typename new_T>
-class Iterator;
+bool constructor_check();
+bool get_set_check();
+bool to_array_check();
+bool operators_check();
+bool iterators_check();
 
-template <typename T>
-class m_vector
+bool (*const checks[]) (void) = {constructor_check, get_set_check, to_array_check, operators_check, iterators_check};
+
+int main()
 {
-private:
-    size_t n;
-    T *data;
-
-public:
-    m_vector(std::initializer_list<T> lst) : n{lst.size()}, data(new T[n])
-    {
-        std::copy(lst.begin(), lst.end(), data);
-    }
-
-    Iterator<T> iterator_begin()
-    {
-        return Iterator<T>(this, 0);
-    }
-
-    Iterator<T> iterator_end()
-    {
-        return Iterator<T>(this, n);
-    }
-
-    explicit m_vector(int length) : n{(size_t)length}, data(new T[n]) {}
-
-    m_vector(m_vector<T> &vect) : n{(size_t)vect.get_length()}, data(new T[n])
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            data[i] = vect[i];
-        }
-        //*this = vect;
-    }
-    ~m_vector()
-    {
-        delete[] data;
-    }
-    m_vector<T>& operator =( m_vector<T> const& lst)  ///m_vector const& lst
-    {
-        if(this == &lst)
-            return *this;
-
-        delete[] data;
-        n = lst.get_length();
-        data = new T[n];
-        for(size_t i = 0; i < n; i++)
-            data[i] = lst[i];
-        return *this;
-    }
-    int get_length() const
-    {
-        return (int)n;
-    }
-    T* to_array()   ///Function cannot return array type 'T []'
-    {
-        T *new_array = new T[n];
-        for(size_t i = 0; i < get_length(); i++)
-            new_array[i] = data[i];
-        return new_array;
-    }
-    T& operator[](int index)
-    {
-        return data[(size_t)index];
-    }
-
-    T& operator[](int index) const
-    {
-        return data[(size_t)index];
-    }
-    template<typename _T>
-    friend std::ostream& operator <<(std::ostream& os, m_vector<_T>& lst);
-
-    m_vector<T>& operator +=( m_vector<T>& vect)
-    {
-        for(size_t i = 0; i < MIN(this->get_length(), vect.get_length()); i++)
-            data[i] += vect[i];
-        return *this;
-    }
-    m_vector<T>& operator -=( m_vector<T>& vect)
-    {
-        for(size_t i = 0; i < MIN(this->get_length(), vect.get_length()); i++)
-            data[i] -= vect[i];
-        return *this;
-    }
-    m_vector<T>& operator *=( T& val)
-    {
-        for(size_t i = 0; i < this->get_length(); i++)
-            data[i] *= val;
-        return *this;
-    }
-    m_vector<T>& operator /=( T& val)
-    {
-        for(size_t i = 0; i < this->get_length(); i++)
-            data[i] /= val;
-        return *this;
-    }
-
-    template<typename _T>
-    friend m_vector<_T> operator +(m_vector<_T>& v1, m_vector<_T>& v2); ///зачем friend
-
-    template<typename _T>
-    friend m_vector<_T> operator -(m_vector<_T>& v1, m_vector<_T>& v2); ///зачем friend
-
-    template<typename _T>
-    friend m_vector<_T> operator *(m_vector<_T>& v1, _T& val);  ///зачем friend
-
-    template<typename _T>
-    friend m_vector<_T> operator /(m_vector<_T>& v1, _T& val);  ///зачем friend
-};
-
-template<typename _T>
-std::ostream& operator <<(std::ostream& os, m_vector<_T>& lst)
-{
-    os << "m_vector(";
-    size_t i = 0;
-    for(; i < lst.get_length() - 1; i++)
-        os << lst.data[i] << ", ";
-    return os << lst.data[i] << ")";
-    //return os;
-}
-
-template<typename _T>
-m_vector<_T> operator +(m_vector<_T>& v1, m_vector<_T>& v2)
-{
-    m_vector<_T> new_vector(v1);
-    new_vector += v2;
-    return new_vector;
-}
-
-template<typename _T>
-m_vector<_T> operator -(m_vector<_T>& v1, m_vector<_T>& v2)
-{
-    m_vector<_T> new_vector(v1);
-    new_vector -= v2;
-    return new_vector;
-}
-
-template<typename _T>
-m_vector<_T> operator *(m_vector<_T>& v1, _T& val)
-{
-    m_vector<_T> new_vector(v1);
-    new_vector *= val;
-    return new_vector;
-}
-
-template<typename _T>
-m_vector<_T> operator /(m_vector<_T>& v1, _T& val)
-{
-    m_vector<_T> new_vector(v1);
-    new_vector /= val;
-    return new_vector;
-}
-
-template<typename T>
-class Iterator {
-private:
-    size_t i;
-    m_vector<T> *container_obj;
-
-public:
-    Iterator<T>(m_vector<T> container_obj) : i{0}, container_obj{&container_obj} {}
-    Iterator<T>(m_vector<T> *container_obj, size_t n) : i{n}, container_obj{container_obj} {}
-    //Iterator(T *first) : cur {first} {}
-
-    Iterator<T> next() {
-        i++;
-        return *this;
-    }
-
-    T value() {
-        return (*container_obj)[i];
-    }
-
-    Iterator &operator++() {
-        return next();
-    }
-
-    T &operator*() {
-        return value();
-    }
-
-    bool operator==(Iterator &b) {
-        return *this == b;
-    }
-
-    bool operator!=(Iterator &b) {
-        return *this != b;
-    }
-
-    bool is_end()
-    {
-        return i == container_obj->get_length();
-    }
-};
-
-int main() {
-    /*m_vector<int> the_vector(10);
-   // Iterator_LOL<int> the_iterator = the_vector.iterator_begin();
-
-    //m_vector<int>::Iterator<int> the_iterator = the_vector.iterator_begin();
-    //std::cout << the_iterator.value() << std::endl;
-
-    std::cout << the_vector.get_length() << " " << the_vector << std::endl;
-    std::cout << the_vector << std::endl;
+    for(auto f : checks)
+        if(f())
+            return 1;
 
 
-    //Iterator<int> new_iterator(the_vector);
-    Iterator<int> new_iterator = the_vector.iterator_end();
+    m_vector <int> the_vector({-9, -8, -7, -6, -5, 3, 4, 6, 0});
 
-    int i = 0;
-    while(!new_iterator.is_end())
-    {
-        std::cout << i << " = " << new_iterator.value() << "\n";
-        new_iterator.next();
-        i++;
-    }*/
-    m_vector<int> the_vector_1({0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-    m_vector<int> the_vector_2({10, 11, 12, 13, 14, 15, 16, 17, 18, 19});
-
-    std::cout << the_vector_1 << std::endl;
-    std::cout << the_vector_2 << std::endl;
-
-    m_vector<int> the_vector_3(10);
-    the_vector_3 = the_vector_2 + the_vector_1;
-
-    std::cout << the_vector_3 << std::endl;
-
+    std::cout << "cout vec \"" << the_vector << "\"" << std::endl;
+    std::cerr << "cerr vec \"" << the_vector << "\"" << std::endl;
     return 0;
+}
+
+bool constructor_check(){
+    int standard_length = 10;
+    {//проверка конструктора длины
+        m_vector <int> the_vector(standard_length);
+        if(the_vector.get_length() != standard_length){
+            std::cerr << "error length constructor, expected = " << standard_length << " length = " << the_vector.get_length() << std::endl;
+            return true;
+        }
+    }
+    {// отрицательная длина
+        std::streambuf *buffer = std::cerr.rdbuf();
+        std::cerr.rdbuf(nullptr);
+        m_vector <int> the_vector(-standard_length);
+
+        if(the_vector.get_length() != standard_length){
+            std::cerr.rdbuf(buffer);
+            std::cerr << "error negative length constructor, expected = " << standard_length << " length = " << the_vector.get_length() << std::endl;
+            return true;
+        }
+        std::cerr.rdbuf(buffer);
+    }
+    {//конструктора копирования
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2(the_vector_1);
+        for(int i = 0; i < standard_length; i++){
+            if(the_vector_1[i] != the_vector_2[i]){
+                std::cerr << "error copy constructor, expected = " << the_vector_1[i] << " value = " << the_vector_2[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {//конструктор инициализации
+        m_vector <int> the_vector({-3, -2, -1, 0, 1, 2 , 3});
+        if(the_vector.get_length() != 7){
+            std::cerr << "error length constructor, expected = " << 7 << " length = " << the_vector.get_length() << std::endl;
+            return true;
+        }
+        for(int i = 0; i < the_vector.get_length(); i++){
+            if(the_vector[i] != i - 3){
+                std::cerr << "error copy constructor, expected = " << i - 3 << " value = " << the_vector[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    std::cout << "construct check passed" << std::endl;
+    return false;
+}
+
+bool get_set_check(){
+    {// get check
+        m_vector <int> the_vector({-3, -2, -1, 0, 1, 2 , 3});
+        for(int i = 0; i < the_vector.get_length(); i++){
+            auto value = the_vector[i];
+            if(value != i - 3){
+                std::cerr << "error get[], expected = " << i - 3 << " value = " << value << std::endl;
+                return true;
+            }
+        }
+        for(int i = 0; i < the_vector.get_length(); i++){
+            auto value = the_vector.get_elem(i);
+            if(value != i - 3){
+                std::cerr << "error get(), expected = " << i - 3 << " value = " << value << std::endl;
+                return true;
+            }
+        }
+        for(int i = 0; i < the_vector.get_length(); i++){
+            auto value1 = the_vector.get_elem(i);
+            auto value2 = the_vector[i];
+            if(value1 != value2){
+                std::cerr << "error get() != get[], get() = " << value1 << " get[] = " << value2 << std::endl;
+                return true;
+            }
+        }
+        std::streambuf *buffer = std::cerr.rdbuf();
+        std::cerr.rdbuf(nullptr);
+        {
+            auto value = the_vector.get_elem(-1);
+            if(value != -3){
+                std::cerr.rdbuf(buffer);
+                std::cerr << "error get(-1), expected = " << -3 << " length = " << value << std::endl;
+                return true;
+            }
+        }
+        {
+            auto value = the_vector.get_elem(the_vector.get_length());
+            if(value != 3){
+                std::cerr.rdbuf(buffer);
+                std::cerr << "error get(len), expected = " << 3 << " length = " << value << std::endl;
+                return true;
+            }
+        }
+        {
+            auto value = the_vector[-1];
+            if(value != -3){
+                std::cerr.rdbuf(buffer);
+                std::cerr << "error get[-1], expected = " << -3 << " length = " << value << std::endl;
+                return true;
+            }
+        }
+        {
+            auto value = the_vector[the_vector.get_length()];
+            if(value != 3){
+                std::cerr.rdbuf(buffer);
+                std::cerr << "error get[len], expected = " << 3 << " length = " << value << std::endl;
+                return true;
+            }
+        }
+        std::cerr.rdbuf(buffer);
+    }
+    {// set check
+        m_vector<int> the_vector({-3, -2, -1, 0, 1, 2, 3});
+        for (int i = 0; i < the_vector.get_length(); i++) {
+            int diff = 20;
+            auto pred_value = the_vector.get_elem(i) + diff;
+            the_vector.set_elem(i, pred_value);  //non const
+            auto post_value = the_vector.get_elem(i);
+            if(post_value != pred_value){
+                std::cerr << "error set(" << i << "), pred_get() + diff = " << pred_value << " post_get() = " << post_value << std::endl;
+                return true;
+            }
+        }
+        std::streambuf *buffer = std::cerr.rdbuf();
+        std::cerr.rdbuf(nullptr);
+        {
+            int diff = 20;
+            int i= -1;
+            auto pred_value = the_vector.get_elem(i) + diff;
+            the_vector.set_elem(i, pred_value);  //non const
+            auto post_value = the_vector.get_elem(i);
+            if(post_value != pred_value){
+                std::cerr.rdbuf(buffer);
+                std::cerr << "error set(" << i << "), pred_get() + diff = " << pred_value << " post_get() = " << post_value << std::endl;
+                return true;
+            }
+        }
+        {
+            int diff = 20;
+            int i= the_vector.get_length();
+            auto pred_value = the_vector.get_elem(i) + diff;
+            the_vector.set_elem(i, pred_value);  //non const
+            auto post_value = the_vector.get_elem(i);
+            if(post_value != pred_value){
+                std::cerr.rdbuf(buffer);
+                std::cerr << "error set(" << i << "), pred_get() + diff = " << pred_value << " post_get() = " << post_value << std::endl;
+                return true;
+            }
+        }
+        std::cerr.rdbuf(buffer);
+    }
+    std::cout << "get/set check passed" << std::endl;
+    return false;
+}
+bool to_array_check()
+{
+    m_vector<int> the_vector({-3, -2, -1, 0, 1, 2, 3});
+    int *array = the_vector.to_array();
+    for (int i  = 0; i < the_vector.get_length(); i++)
+    {
+        if(the_vector[i] != array[i])
+        {
+            std::cerr << "error to_array(), expected (" << i << ") = " << the_vector[i] << " val = " << array[i] << std::endl;
+            return true;
+        }
+    }
+    delete array;
+
+    std::cout << "to_array check passed" << std::endl;
+    return false;
+}
+
+bool operators_check() {
+    int standard_length = 10;
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2 = the_vector_1;
+
+        if(the_vector_1.get_length() != the_vector_2.get_length())
+        {
+            std::cerr << "error operator \"=\",  expected len = " << the_vector_1.get_length() << " len = " << the_vector_2.get_length() << std::endl;
+            return true;
+        }
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            if(the_vector_1[i] != the_vector_2[i]){
+                std::cerr << "error operator \"=\",  expected val[" << i << "] = " << the_vector_1[i] << " val = " << the_vector_2[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2(standard_length);
+        m_vector <int> the_vector_3 = the_vector_2;
+        the_vector_3 += the_vector_1;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value =  the_vector_1[i] + the_vector_2[i];
+            if(value != the_vector_3[i]){
+                std::cerr << "error operator \"+=\",  expected val[" << i << "] = " << value << " val = " << the_vector_3[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2(standard_length);
+        m_vector <int> the_vector_3 = the_vector_2;
+        the_vector_3 -= the_vector_1;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value = the_vector_2[i] - the_vector_1[i] ;
+            if(value != the_vector_3[i]){
+                std::cerr << "error operator \"-=\",  expected val[" << i << "] = " << value << " val = " << the_vector_3[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2 = the_vector_1;
+        int multiplier = 5;
+        the_vector_2 *= multiplier;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value = the_vector_1[i] * multiplier;
+            if(value != the_vector_2[i]){
+                std::cerr << "error operator \"*=\",  expected val[" << i << "] = " << value << " val = " << the_vector_2[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2 = the_vector_1;
+        int divider = 5;
+        the_vector_2 /= divider;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value = the_vector_1[i] / divider;
+            if(value != the_vector_2[i]){
+                std::cerr << "error operator \"/=\",  expected val[" << i << "] = " << value << " val = " << the_vector_2[i] << std::endl;
+                return true;
+            }
+        }
+    }
+
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2(standard_length);
+        m_vector <int> the_vector_3 = the_vector_2 + the_vector_1;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value =  the_vector_1[i] + the_vector_2[i];
+            if(value != the_vector_3[i]){
+                std::cerr << "error operator \"+\",  expected val[" << i << "] = " << value << " val = " << the_vector_3[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2(standard_length);
+        m_vector <int> the_vector_3 = the_vector_2 - the_vector_1;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value = the_vector_2[i] - the_vector_1[i];
+            if(value != the_vector_3[i]){
+                std::cerr << "error operator \"-\",  expected val[" << i << "] = " << value << " val = " << the_vector_3[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        int multiplier = 5;
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2 = the_vector_1 * multiplier;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value = the_vector_1[i] * multiplier;
+            if(value != the_vector_2[i]){
+                std::cerr << "error operator \"*\",  expected val[" << i << "] = " << value << " val = " << the_vector_2[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    {
+        int divider = 5;
+        m_vector <int> the_vector_1(standard_length);
+        m_vector <int> the_vector_2 = the_vector_1 / divider;
+
+        for (int i = 0; i < the_vector_1.get_length(); i++) {
+            auto value = the_vector_1[i] / divider;
+            if(value != the_vector_2[i]){
+                std::cerr << "error operator \"/\",  expected val[" << i << "] = " << value << " val = " << the_vector_2[i] << std::endl;
+                return true;
+            }
+        }
+    }
+    std::cout << "operators check passed" << std::endl;
+    return false;
+}
+
+bool iterators_check()
+{
+    int standard_length = 10;
+    {
+        m_vector <int> the_vector(standard_length);
+        Iterator<int> it = the_vector.iterator_begin();
+
+        for (int i = 0; i < the_vector.get_length(); i++)
+        {
+            auto value = it.value();
+            if(value != the_vector[i])
+            {
+                std::cerr << "error Iterator without overload, expected val[" << i << "] = " << the_vector[i] << " val = " << value << std::endl;
+                return true;
+            }
+            it.next();
+        }
+        Iterator<int> end = the_vector.iterator_end();
+        if(it != end)
+        {
+            std::cerr << "error Iterator without overload, it != iterator_end" << std::endl;
+            return true;
+        }
+        if(!it.is_end())
+        {
+            std::cerr << "error Iterator without overload, !it.is_end()" << std::endl;
+            return true;
+        }
+    }
+    {
+        m_vector <int> the_vector(standard_length);
+        Iterator<int> it = the_vector.iterator_begin();
+
+        for (int i = 0; i < the_vector.get_length(); i++)
+        {
+            auto value = *it;
+            if(value != the_vector[i])
+            {
+                std::cerr << "error Iterator with overload, expected val[" << i << "] = " << the_vector[i] << " val = " << value << std::endl;
+                return true;
+            }
+            ++it;
+        }
+        Iterator<int> end = the_vector.iterator_end();
+        if(it != end)
+        {
+            std::cerr << "error Iterator with overload, it != iterator_end" << std::endl;
+            return true;
+        }
+        if(!it.is_end())
+        {
+            std::cerr << "error Iterator with overload, !it.is_end()" << std::endl;
+            return true;
+        }
+    }
+    std::cout << "iterators check passed" << std::endl;
+    return false;
 }
