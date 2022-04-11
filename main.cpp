@@ -24,7 +24,7 @@ int main()
 }
 
 bool constructor_check(){
-    int standard_length = 10;
+    const int standard_length = 10;
     {//проверка конструктора длины
         m_vector <int> the_vector(standard_length);
         if(the_vector.get_length() != standard_length){
@@ -194,7 +194,7 @@ bool to_array_check()
 }
 
 bool operators_check() {
-    int standard_length = 10;
+    const int standard_length = 10;
     {
         m_vector <int> the_vector_1(standard_length);
         m_vector <int> the_vector_2 = the_vector_1;
@@ -327,7 +327,7 @@ bool operators_check() {
 
 bool iterators_check()
 {
-    int standard_length = 10;
+    const int standard_length = 10;
     {
         m_vector <int> the_vector(standard_length);
         Iterator<int> it = the_vector.iterator_begin();
