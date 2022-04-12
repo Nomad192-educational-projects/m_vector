@@ -95,17 +95,6 @@ template <typename T> T& m_vector<T>::operator[](int index)
 }
 template <typename T> T& m_vector<T>::operator[](int index) const
 {
-    /*if(index < 0){
-        int standard_index = 0;
-        std::cerr << "incorrect index - " << index << "standard index = " << standard_index << std::endl;
-        index = standard_index;
-    }
-    if(index >= n){
-        int standard_index = n - 1;
-        std::cerr << "incorrect index - " << index << "standard index = " << standard_index << std::endl;
-        index = standard_index;
-    }
-    return data[index];*/
     return (*this)[index];
 }
 
@@ -121,14 +110,14 @@ template <typename T> m_vector<T>& m_vector<T>::operator -=( m_vector<T>& vect)
         data[i] -= vect[i];
     return *this;
 }
-template <typename T> m_vector<T>& m_vector<T>::operator *=( T& val)
+template <typename T> m_vector<T>& m_vector<T>::operator *=( T const& val)
 {
     for(size_t i = 0; i < this->get_length(); i++)
         data[i] *= val;
     return *this;
 }
-template <typename T> m_vector<T>& m_vector<T>::operator /=( T& val)
-        {
+template <typename T> m_vector<T>& m_vector<T>::operator /=( T const& val)
+{
     for (size_t i = 0; i < this->get_length(); i++)
         data[i] /= val;
     return *this;
@@ -142,9 +131,6 @@ template <typename T> Iterator<T> m_vector<T>::iterator_end()
 {
     return Iterator<T>(this, n);
 }
-
-
-
 
 template <typename T> Iterator<T>::Iterator(m_vector<T> container_obj) : i{0}, container_obj{container_obj} {}
 template <typename T> Iterator<T>::Iterator(m_vector<T> *container_obj, size_t n) : i{n}, container_obj{*container_obj} {}

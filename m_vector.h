@@ -33,8 +33,8 @@ public:
 
     m_vector<T>& operator +=( m_vector<T>& vect);
     m_vector<T>& operator -=( m_vector<T>& vect);
-    m_vector<T>& operator *=( T& val);
-    m_vector<T>& operator /=( T& val);
+    m_vector<T>& operator *=( T const& val);
+    m_vector<T>& operator /=( T const& val);
 
     template<typename _T>
     friend m_vector<_T> operator +(m_vector<_T>& v1, m_vector<_T>& v2); ///зачем friend
