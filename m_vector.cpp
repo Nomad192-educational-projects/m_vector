@@ -132,18 +132,20 @@ template <typename T> Iterator<T> m_vector<T>::iterator_end()
     return Iterator<T>(this, n);
 }
 
-template <typename T> Iterator<T>::Iterator(m_vector<T> container_obj) : i{0}, container_obj{container_obj} {}
+template <typename T> Iterator<T>::Iterator(m_vector<T> &container_obj) : i{0}, container_obj{container_obj} {}
 template <typename T> Iterator<T>::Iterator(m_vector<T> *container_obj, size_t n) : i{n}, container_obj{*container_obj} {}
 
 template <typename T> Iterator<T> Iterator<T>::next() {
-    i++;
+    if(!this->is_end())
+        i++;
     return *this;
 }
 template <typename T> T Iterator<T>::value() {
     return container_obj[i];
 }
 template <typename T> Iterator<T>& Iterator<T>::operator++() {
-    i++;
+    if(!this->is_end())
+        i++;
     return *this;
 }
 template <typename T> T& Iterator<T>::operator*() {

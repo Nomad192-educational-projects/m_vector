@@ -94,7 +94,7 @@ private:
     m_vector<T> &container_obj;
 
 public:
-    Iterator<T>(m_vector<T> container_obj);
+    Iterator<T>(m_vector<T> &container_obj);
     Iterator<T>(m_vector<T> *container_obj, size_t n);
     Iterator<T> next();
     T value();

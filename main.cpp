@@ -20,6 +20,14 @@ int main()
 
     std::cout << "cout vec \"" << the_vector << "\"" << std::endl;
     std::cerr << "cerr vec \"" << the_vector << "\"" << std::endl;
+
+    Iterator<int> it(the_vector);
+
+    while(!it.is_end())
+    {
+        std::cout << *it << " ";
+        ++it;
+    }
     return 0;
 }
 
@@ -33,7 +41,7 @@ bool constructor_check(){
         }
     }
     {// отрицательная длина
-        std::streambuf *buffer = std::cerr.rdbuf();
+        /*std::streambuf *buffer = std::cerr.rdbuf();
         std::cerr.rdbuf(nullptr);
         m_vector <int> the_vector(-standard_length);
 
@@ -42,7 +50,7 @@ bool constructor_check(){
             std::cerr << "error negative length constructor, expected = " << standard_length << " length = " << the_vector.get_length() << std::endl;
             return true;
         }
-        std::cerr.rdbuf(buffer);
+        std::cerr.rdbuf(buffer);*/
     }
     {//конструктора копирования
         m_vector <int> the_vector_1(standard_length);
