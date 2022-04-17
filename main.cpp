@@ -16,7 +16,7 @@ int main()
             return 1;
 
 
-    m_vector <int> the_vector({-9, -8, -7, -6, -5, 3, 4, 6, 0});
+    m_vector <int> the_vect or({-9, -8, -7, -6, -5, 3, 4, 6, 0});
 
     std::cout << "cout vec \"" << the_vector << "\"" << std::endl;
 
