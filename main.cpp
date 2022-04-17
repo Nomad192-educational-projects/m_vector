@@ -19,15 +19,15 @@ int main()
     m_vector <int> the_vector({-9, -8, -7, -6, -5, 3, 4, 6, 0});
 
     std::cout << "cout vec \"" << the_vector << "\"" << std::endl;
-    std::cerr << "cerr vec \"" << the_vector << "\"" << std::endl;
 
+    std::cout << "cout vec iter val =";
     Iterator<int> it(the_vector);
-
     while(!it.is_end())
     {
-        std::cout << *it << " ";
+        std::cout << *it << "  ";
         ++it;
     }
+    std::cout << std::endl;
     return 0;
 }
 
